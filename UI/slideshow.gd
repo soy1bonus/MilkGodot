@@ -13,9 +13,9 @@ var _tween: Tween
 var _start_msec: int
 
 ## Only play the animations if we're the first sibling or we don't have a parent.
-func _ready():	
+func _ready() -> void:	
 	# Set the alpha to zero
-	modulate.a = 0
+	modulate = Color.TRANSPARENT
 
 	# Only play the animation if we're the first slide
 	if (get_parent() == null) or (get_index() == 0):
@@ -24,21 +24,28 @@ func _ready():
 		process_mode = Node.PROCESS_MODE_DISABLED
 
 	
-func _animate():
+func _animate() -> void:
 	print("Animating slide '%s'" % name)
 	process_mode = Node.PROCESS_MODE_INHERIT
 	visible = true
 	_start_msec = Time.get_ticks_msec()
 	_tween = create_tween()
 	_tween.set_parallel(true)
-	_tween.set_trans(Tween.TRANS_CUBIC).tween_property(self, "modulate", Color.WHITE, fade_in_time * 0.5)
+	var alphaTime: float = fade_in_time * 0.5
+	# Fade In
+	_tween.set_trans(Tween.TRANS_CUBIC).tween_property(self, "modulate", Color.WHITE, alphaTime)
 	_tween.set_trans(Tween.TRANS_CUBIC).tween_property(self, "scale", Vector2.ONE, fade_in_time).from(Vector2(1.05, 1.05))
-	_tween.tween_interval(wait_time)	
+	# Wait Time
+	_tween.tween_interval(wait_time)
+	# Fade Out
+	var fadeOutDelay: float = fade_in_time + wait_time
+	_tween.set_trans(Tween.TRANS_CUBIC).tween_property(self, "modulate", Color.TRANSPARENT, fade_out_time).set_delay(fadeOutDelay)
+	# Wait for the animation to end and skip to the next slide
 	await _tween.finished
 	_callNextSlide()	
 
 ## Skip to the next slide if any input is pressed
-func _input(event: InputEvent):
+func _input(event: InputEvent) -> void:
 	if process_mode == Node.PROCESS_MODE_DISABLED: return
 	if Utils.get_elapsed_seconds(_start_msec) < fade_in_time: return
 	if _tween == null: return
@@ -48,7 +55,7 @@ func _input(event: InputEvent):
 
 
 ## Reset the state of the current slide (not visible, process disabled, white tinted and scale 1)
-func _reset():
+func _reset() -> void:
 	_tween = null
 	modulate = Color.WHITE
 	scale = Vector2.ONE
@@ -56,7 +63,7 @@ func _reset():
 	visible = false
 
 ## Callback that should be played once this slide animation ends to start the next one.
-func _callNextSlide():
+func _callNextSlide() -> void:
 	const END_MSG: String = "Slideshow end"
 	_reset()
 	
