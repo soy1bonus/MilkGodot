@@ -5,9 +5,12 @@ class_name Slideshow extends Control
 @export_range(0,5) var fade_in_time: float = 1.5
 @export_range(0,5) var wait_time: float = 2.5
 @export_range(0,5) var fade_out_time: float = 0.5
+## Loads this scene if it's the last element of the slideshowß
+@export_file("*.tscn") var next_scene: String
 
 # We store the Tween, in case we need to stop it
 var _tween: Tween
+
 # Store the starting time of the animation, to ensure enough time has passed before
 # being able to interrupt the animation
 var _start_msec: int
@@ -44,6 +47,7 @@ func _animate() -> void:
 	await _tween.finished
 	_callNextSlide()	
 
+
 ## Skip to the next slide if any input is pressed
 func _input(event: InputEvent) -> void:
 	if process_mode == Node.PROCESS_MODE_DISABLED: return
@@ -62,27 +66,36 @@ func _reset() -> void:
 	process_mode = Node.PROCESS_MODE_DISABLED
 	visible = false
 
+
+## Only called on the final element of the slideshow. It'll be ignored on all others.
+func _finish() -> void:
+	print("Slideshow end")
+	if next_scene == null or next_scene.is_empty():
+		return
+	# Load the next scene
+	
+
+
 ## Callback that should be played once this slide animation ends to start the next one.
 func _callNextSlide() -> void:
-	const END_MSG: String = "Slideshow end"
 	_reset()
 	
 	# Check if it has a parent
 	var parent := get_parent()
 	if parent == null:
-		print(END_MSG)
+		_finish()
 		return
 		
 	# Check if the next inex is valid
 	var next_index: int = get_index() + 1
 	if next_index >= parent.get_child_count(): 
-		print(END_MSG)
+		_finish()
 		return
 		
 	# Check if the next sibling is a Slideshow tooß
 	var next_sibling: Slideshow = parent.get_child(next_index)
 	if next_sibling == null: 
-		print(END_MSG)
+		_finish()
 		return
 		
 	# Animate the next slide
