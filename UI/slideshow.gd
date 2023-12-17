@@ -5,8 +5,8 @@ class_name Slideshow extends Control
 @export_range(0,5) var fade_in_time: float = 1.5
 @export_range(0,5) var wait_time: float = 2.5
 @export_range(0,5) var fade_out_time: float = 0.5
-## Loads this scene if it's the last element of the slideshowß
-@export_file("*.tscn") var next_scene: String
+
+signal slideshow_finished
 
 # We store the Tween, in case we need to stop it
 var _tween: Tween
@@ -70,10 +70,7 @@ func _reset() -> void:
 ## Only called on the final element of the slideshow. It'll be ignored on all others.
 func _finish() -> void:
 	print("Slideshow end")
-	if next_scene == null or next_scene.is_empty():
-		return
-	# Load the next scene
-	
+	slideshow_finished.emit()
 
 
 ## Callback that should be played once this slide animation ends to start the next one.
