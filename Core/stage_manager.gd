@@ -8,23 +8,25 @@ extends Node
 var _stage_root: Node
 var _game_root: Node
 
+const DATA_PATH: String = "res://Resources/StageManagerData.tres"
+
 enum StageManagerState { IDLE, INIT, LOAD }
 var _state : StageManagerState = StageManagerState.INIT
 
-var _next_stage_path: String
+var _next_stage_uid: int
 
 # TODO push_stage and pop_stage
 
 ## Loads the stage specified in the path in the next frame (clearing the previous ones)
-func load_stage(_path: String) -> void:
-	_next_stage_path = _path
+func load_stage(_stage_uid: int) -> void:
+	_next_stage_uid = _stage_uid
 	_state = StageManagerState.LOAD
 	process_mode = Node.PROCESS_MODE_INHERIT
 
 #region Internal Methods
 func _initialize() -> void:
 	# Load the config resource
-	const DATA_PATH: String = "res://Resources/StageManagerData.tres"
+
 	var data: StageManagerData = load(DATA_PATH)
 	assert(data != null, "Couldn't load %s" % DATA_PATH)	
 	assert(data.stage_root_name != null and !data.stage_root_name.is_empty(), "No Stage Root name specified!")
@@ -39,13 +41,17 @@ func _initialize() -> void:
 	_load_stage(data.starting_stage)
 
 
-func _load_stage(_stage_path: String) -> void:
-	assert(_stage_path != null and !_stage_path.is_empty())
+func _load_stage(_stage_uid: int) -> void:
+
+	if (!ResourceUID.has_id(_stage_uid)):
+		print("Trying to load invalid UID '%s'" % _stage_uid)
+		return
+	
 	# Remove previous stage
 	Utils.clear_all_chilren(_stage_root)
 	# Load next stage
-	print("Loading stage '%s'" % _stage_path)
-	var sceneRef: PackedScene = load(_stage_path)
+	print("Loading stage '%s'" % ResourceUID.get_id_path(_stage_uid))
+	var sceneRef: PackedScene = load(ResourceUID.id_to_text(_stage_uid))
 	var scene: Node = sceneRef.instantiate()
 	_stage_root.add_child(scene)
 
@@ -55,7 +61,7 @@ func _process(_delta: float) -> void:
 		StageManagerState.INIT:
 			_initialize()
 		StageManagerState.LOAD:
-			_load_stage(_next_stage_path)
+			_load_stage(_next_stage_uid)
 	_state = StageManagerState.IDLE
 	# Disable processing, this is used just as a way to initialize everything
 	process_mode = Node.PROCESS_MODE_DISABLED
