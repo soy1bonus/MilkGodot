@@ -25,32 +25,47 @@ func load_stage(_stage_uid: int) -> void:
 
 #region Internal Methods
 func _initialize() -> void:
+	Log.init()
 	# Load the config resource
-
 	var data: StageManagerData = load(DATA_PATH)
-	assert(data != null, "Couldn't load %s" % DATA_PATH)	
-	assert(data.stage_root_name != null and !data.stage_root_name.is_empty(), "No Stage Root name specified!")
-	assert(data.game_root_name != null and !data.game_root_name.is_empty(), "No Game Root name specified!")
+	
+	if data == null:
+		Log.error("Couldn't load %s" % DATA_PATH)
+		return
+	if data.stage_root_name == null or data.stage_root_name.is_empty():
+		Log.error("No Stage Root name specified!")
+		return
+	if data.game_root_name == null or data.game_root_name.is_empty():
+		Log.error("No Game Root name specified!")
+		return
+
 	# Get Stage and Game root nodes
 	var root: Node = get_tree().root
 	_stage_root = root.find_child(data.stage_root_name, true, false)
-	assert(_stage_root != null, "No stage root with name '%s' found!" % data.stage_root_name)
+	if _stage_root == null:
+		Log.error("No stage root with name '%s' found!" % data.stage_root_name)
+		return
+
 	_game_root = root.find_child(data.game_root_name, true, false)
-	assert(_game_root != null, "No game root with name '%s' found!" % data.game_root_name)
+	if _game_root == null:
+		Log.error("No game root with name '%s' found!" % data.game_root_name)
+		return
+
 	# Load the starting stage
-	_load_stage(data.starting_stage)
+	_load_stage(data.starting_stage_uid)
 
 
 func _load_stage(_stage_uid: int) -> void:
 
 	if (!ResourceUID.has_id(_stage_uid)):
-		print("Trying to load invalid UID '%s'" % _stage_uid)
+		Log.error("Trying to load invalid UID '%s'" % _stage_uid)
 		return
 	
 	# Remove previous stage
 	Utils.clear_all_chilren(_stage_root)
+	
 	# Load next stage
-	print("Loading stage '%s'" % ResourceUID.get_id_path(_stage_uid))
+	Log.msg("Loading stage '%s'" % ResourceUID.get_id_path(_stage_uid))
 	var sceneRef: PackedScene = load(ResourceUID.id_to_text(_stage_uid))
 	var scene: Node = sceneRef.instantiate()
 	_stage_root.add_child(scene)
