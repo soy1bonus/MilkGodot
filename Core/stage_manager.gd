@@ -52,11 +52,10 @@ func _initialize() -> void:
 		return
 
 	# Load the starting stage
-	_load_stage(data.starting_stage_uid)
+	_load_stage(data.get_starting_stage_uid())
 
 
 func _load_stage(_stage_uid: int) -> void:
-
 	if (!ResourceUID.has_id(_stage_uid)):
 		Log.error("Trying to load invalid UID '%s'" % _stage_uid)
 		return

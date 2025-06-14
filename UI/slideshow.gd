@@ -28,7 +28,7 @@ func _ready() -> void:
 
 	
 func _animate() -> void:
-	print("Animating slide '%s'" % name)
+	Log.msg("Animating slide '%s'" % name)
 	process_mode = Node.PROCESS_MODE_INHERIT
 	visible = true
 	_start_msec = Time.get_ticks_msec()
@@ -69,7 +69,7 @@ func _reset() -> void:
 
 ## Only called on the final element of the slideshow. It'll be ignored on all others.
 func _finish() -> void:
-	print("Slideshow end")
+	Log.msg("Slideshow end")
 	slideshow_finished.emit()
 
 
@@ -89,7 +89,7 @@ func _callNextSlide() -> void:
 		_finish()
 		return
 		
-	# Check if the next sibling is a Slideshow tooß
+	# Check if the next sibling is a Slideshow too
 	var next_sibling: Slideshow = parent.get_child(next_index)
 	if next_sibling == null: 
 		_finish()

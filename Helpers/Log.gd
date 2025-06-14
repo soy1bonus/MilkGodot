@@ -32,11 +32,11 @@ static func header(message: String) -> void:
 
 ## Prints a message to the log, using a Title beforehand
 static func info(title: String, message: String) -> void:
-	print_rich("[color=olive][b]%s:[/b][/color] %s" % [title, message])
+	print_rich("[color=salmon][b]%s:[/b][/color] %s" % [title, message])
 
 ## Prints a message to the log, adding a timestamp
 static func msg(message: String) -> void:
-	print_rich("[color=olive](%s)[/color] %s" % [Time.get_datetime_string_from_system(true,true), message])
+	print_rich("[color=teal](%s)[/color] %s" % [Time.get_datetime_string_from_system(true,true), message])
 
 static func error(message: String) -> void:
 	print_rich("[color=red](%s) [b]%s[/b][/color]" % [Time.get_datetime_string_from_system(true,true), message])
