@@ -6,7 +6,7 @@ class_name Slideshow extends Control
 @export_range(0,5) var wait_time: float = 2.5
 @export_range(0,5) var fade_out_time: float = 0.5
 
-signal slideshow_finished
+signal finished
 
 # We store the Tween, in case we need to stop it
 var _tween: Tween
@@ -28,7 +28,7 @@ func _ready() -> void:
 
 	
 func _animate() -> void:
-	Log.msg("Animating slide '%s'" % name)
+	MilkLog.msg("Animating slide '%s'" % name)
 	process_mode = Node.PROCESS_MODE_INHERIT
 	visible = true
 	_start_msec = Time.get_ticks_msec()
@@ -51,7 +51,7 @@ func _animate() -> void:
 ## Skip to the next slide if any input is pressed
 func _input(event: InputEvent) -> void:
 	if process_mode == Node.PROCESS_MODE_DISABLED: return
-	if Utils.get_elapsed_seconds(_start_msec) < fade_in_time: return
+	if MilkUtils.get_elapsed_seconds(_start_msec) < fade_in_time: return
 	if _tween == null: return
 	if event.is_released():
 		_tween.stop()
@@ -69,8 +69,8 @@ func _reset() -> void:
 
 ## Only called on the final element of the slideshow. It'll be ignored on all others.
 func _finish() -> void:
-	Log.msg("Slideshow end")
-	slideshow_finished.emit()
+	MilkLog.msg("Slideshow end")
+	finished.emit()
 
 
 ## Callback that should be played once this slide animation ends to start the next one.

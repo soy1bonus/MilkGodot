@@ -1,4 +1,4 @@
-class_name Utils extends Object
+class_name MilkUtils extends Object
 
 ## Returns the seconds elapsed between Time and start_msec
 static func get_elapsed_seconds(start_msec: int) -> float:
