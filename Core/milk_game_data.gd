@@ -6,9 +6,9 @@ extends Resource
 
 @export_group("Main Scene Properties")
 ## Section scenes (interfaces/screens) will be parented to this node
-@export var section_root_name: String = "CanvasLayer"
+@export var section_root_name: String = "SectionRoot"
 ## Stage scenes (gameplay/entities) will be parented to this node
-@export var stage_root_name: String = "SubViewport"
+@export var stage_root_name: String = "StageRoot"
 
 func get_starting_section_uid() -> int:
     return ResourceUID.text_to_id(_starting_section_uid)
